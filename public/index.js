@@ -1,4 +1,5 @@
 //get specific url param
+/*
 function getUrlParameter(name) {
     name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
     var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
@@ -13,6 +14,7 @@ var email = getUrlParameter("email") || ''
 if (email !== '') {
   var setCookie = Cookies.set('email',email)
 }
+*/
 
 ///////////////////////////////////////////
 //     make cookies from url params      //
@@ -55,6 +57,8 @@ if (query) {
 ///////////////////////////////////////////
 //    fill in form with cookie values    //
 ///////////////////////////////////////////
+
+/*
 
 var forms = [
   {
@@ -103,3 +107,5 @@ process for adding NEW information to our forms:
 3) set up the server to take info from form and pass to AC (setup integration between steps 1 and 2)
 4) choose key name for url parameter (get variable) (must be the same name as the field name)
 5) start using the url parameter in the emails
+
+*/
