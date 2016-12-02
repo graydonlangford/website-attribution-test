@@ -1,28 +1,5 @@
-//get specific url param
-/*
-function getUrlParameter(name) {
-    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-    var results = regex.exec(location.search);
-    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-};
-
-// call function
-var email = getUrlParameter("email") || ''
-
-// if the param exists, set a cookies with it.
-if (email !== '') {
-  var setCookie = Cookies.set('email',email)
-}
-*/
-
-///////////////////////////////////////////
-//     make cookies from url params      //
-///////////////////////////////////////////
-
-// get ALL query params
 function getQueryParams(qs) {
-    qs = qs.split('+').join(' ');
+    qs = qs.split('+').join(' '); // replace '+' in the querystring with ' ' (space)
 
     var params = {},
         tokens,
@@ -36,76 +13,38 @@ function getQueryParams(qs) {
 }
 
 // call function to get all params
-var query = getQueryParams(document.location.search)
+var query = getQueryParams(document.location.search) //get all the url parameters as an object
+var fieldStartCharacters = 'ac_' // set the characters which determine if a url parameter should be turned into a cookie. key/value pairs with names that start with these characters will be turned into cookies
+var pattern = new RegExp('^(' + fieldStartCharacters + '.+)') // create regex object for testing url parameters
 
 // for each param, if it's a valid one, make a cookie with it.
-if (query) {
-  var fieldStartCharacters = 'ac_'
-  var pattern = new RegExp('^' + fieldStartCharacters + '(.+)')
-
-  for (var param in query) {
-    var fieldName = pattern.exec(param)
-    if (query.hasOwnProperty(param) && fieldName) {
-      fieldName = fieldName[1]
-      $.cookie(fieldName,query[param])
+if (query) { //if there is a query string
+  for (var param in query) { // for each url param key/value pair in the querystring...
+    var fieldName = pattern.exec(param) // run the regex test on the key name
+    if (query.hasOwnProperty(param) && fieldName) { // if the current parameter isn't from the object prototyp, and passed the regex test...
+      $.cookie(fieldName[1],query[param]) // ... then create a cookie with the name of the param, and the value from the url parameter
     }
   }
 }
-
-
 
 ///////////////////////////////////////////
 //    fill in form with cookie values    //
 ///////////////////////////////////////////
 
-/*
-
-var forms = [
-  {
-    formName: 'formname',
-    fields: [
-      {
-        cookieName: 'cookieName',
-        fieldName: 'fieldname',
-        defaultValue: 'defaultvalue'
-      },
-      {
-        cookieName: 'cookieName',
-        fieldName: 'fieldname',
-        defaultValue: 'defaultvalue'
-      }
-    ]
-  }
-  ]
-
-forms.forEach(function(form){
-  form.fields.forEach(function(field){
-    document[form.formName][field.fieldName].value = $.cookie(field.cookieName) || field.defaultValue
-  })
-})
-
-
-
-//////////////////////////////////////////
-cookieformfiller(formId,[]){
-  get array of cookies
-  //get the form (jquery formID)
-  for each cookie variable // cookie_variable == [source,collegeplus]
-    if $(#field_id) == cookie_variable[0]
-      $(#field_id).attr(cookie_variable[1])
-
+// add a function to jquery which allows easy, clear testing if an element was returned from a query
+$.fn.exists = function () {
+  return this.length !== 0;
 }
 
-field[8,0] = 'Nathan'
-field[%FIRST_NAME%,0] = 'Nathan'
+var cookies = $.cookie() //create object of all cookies
 
+for (var cookie in cookies) { // for each cookie
+  var validCookie = cookies.hasOwnProperty(cookie) //make sure the cookie is a real cookie, not a member of the object prototyp
+  var cookieName = pattern.exec(cookie) //check if the cookie's name matches the cookie-form naming convention. This indicates that the cookie should be applied to form fields of the same name. Returns the name if valid.
+  var cookieValue = cookies[cookie] // set a variable with the value of the cookie for easy reference
+  var targetFields = $("[name='" + cookieName[1] + "']") // find all form fields on the page that match the cookie
 
-process for adding NEW information to our forms:
-
-1) add field to form (choose a good ID)
-2) add field (if necessary) to ActiveCampaign (or get the name/id of the field if exist)
-3) set up the server to take info from form and pass to AC (setup integration between steps 1 and 2)
-4) choose key name for url parameter (get variable) (must be the same name as the field name)
-5) start using the url parameter in the emails
-
-*/
+  if (validCookie && cookieName && targetFields.exists()) { // if the cookie is valid, the cookie passes the name test (cookieName is truthy), and the jquery found some form fields...
+    targetFields.val(cookieValue) // ... then change the value of the found jquery elements with the value of the cookie
+  }
+}

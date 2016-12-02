@@ -8,7 +8,14 @@
       <p>First Name: <input type="text" name="fname"></p>
       <p>Last Name: <input type="text" name="lname"></p>
       <p>Email: <input type="email" name="email"></p>
+      <p>Source: <input type="hidden" name="ac_source" value="website"></p>
       <p><input type="submit"></p></form>
+    <form target="dummyframe" action="/forms" method="post">
+      <p>First Name: <input type="text" name="fname"></p>
+      <p>Last Name: <input type="text" name="lname"></p>
+      <p>Email: <input type="email" name="email"></p>
+      <p>Source: <input type="hidden" name="source" value="website"></p>
+      <p><input id="source" type="submit"></p></form>
   <footer>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
