@@ -44,7 +44,7 @@ $(document).ready(()=>{
   fillFieldsWithCookies($.cookie(), pattern)
 
   var observer = new MutationObserver((rec, obs)=>{
-    alert('the dom changed!')
+    fillFieldsWithCookies($.cookie(),pattern)
   })
 
   observer.observe(document,{childList: true, subtree: true})
