@@ -23,33 +23,37 @@ var bake = function (query, pattern) { // for each param, if it's a valid one, m
   }
 }
 
-var fillFieldsWithCookies = function (cookies, pattern) {
+var fillFieldsWithCookies = function (cookies, pattern, type) {
   for (var cookie in cookies) { // for each cookie
     var validCookie = cookies.hasOwnProperty(cookie) //make sure the cookie is a real cookie, not a member of the object prototyp
     var cookieName = pattern.exec(cookie) //check if the cookie's name matches the cookie-form naming convention. This indicates that the cookie should be applied to form fields of the same name. Returns the name if valid.
     var cookieValue = cookies[cookie] // set a variable with the value of the cookie for easy reference
+    var targetFields = ''
 
     if (validCookie && cookieName) { // if the cookie is valid, the cookie passes the name test (cookieName is truthy), and the jquery found some form fields...
-      var targetFields = $("[name='" + cookieName[1] + "']") // find all form fields on the page that match the cookie
+      if (type === 'sumome') {
+        targetFields = $('[name=\'sumome_' + cookieName[1] + '\']'); // for sumome forms, add hidden fields for each cookie to store values using the scheme: 'sumome_ac_cookie'
+      } else {
+        targetFields = $( '.' + cookieName[1]); // for any other forms, add a class using this scheme: 'ac_cookie'
+      }
       targetFields.val(cookieValue) // ... then change the value of the found jquery elements with the value of the cookie
     }
   }
 }
 
-$(document).ready(()=>{
+$(document).ready(function () {
   var fieldStartChars = 'ac_'
   var pattern = new RegExp('^(' + fieldStartChars + '.+)') // create regex object for testing url parameters
 
   bake(getQueryParams(document.location.search), pattern) //make cookies from url params
-  fillFieldsWithCookies($.cookie(), pattern)
+  fillFieldsWithCookies($.cookie(), pattern, '')
 
-  var observer = new MutationObserver((rec, obs)=>{
-    fillFieldsWithCookies($.cookie(),pattern)
+  var observer = new MutationObserver(function (rec, obs) {
+
+    // FIND SUMOME AND GIVE THEM THE RIGHT CLASS
+
+    fillFieldsWithCookies($.cookie(), pattern, 'sumome')
   })
 
   observer.observe(document,{childList: true, subtree: true})
-
-  $('#addmarkup').click(function() {
-    $('#markup-target').append('<p><input type="text" name="ac_newfield"></p>')
-  })
 })
